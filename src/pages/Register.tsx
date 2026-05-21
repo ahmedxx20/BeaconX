@@ -41,7 +41,6 @@ export default function Register() {
       return;
     }
 
-    // حفظ الريفيرال كود عشان نستخدمه بعد التأكيد
     if (referralCode) {
       localStorage.setItem("referralCode", referralCode);
     }
@@ -54,9 +53,8 @@ export default function Register() {
       options: {
         data: { 
           name,
-          withdrawalPin // بعته في metadata عشان تستخدمه في AuthCallback
-        },
-        emailRedirectTo: `${window.location.origin}/auth/callback`
+          withdrawalPin
+        }
       },
     });
 
@@ -64,11 +62,17 @@ export default function Register() {
 
     if (authError) {
       toast.error(authError.message);
-      localStorage.removeItem("referralCode"); // امسحه لو فشل التسجيل
+      localStorage.removeItem("referralCode");
       return;
     }
 
-    toast.success("Check your email to confirm your account");
+    if (authData.session) {
+      toast.success("Account created successfully!");
+      navigate("/dashboard");
+    } else {
+      toast.success("Account created successfully!");
+      navigate("/login");
+    }
   };
 
   return (
@@ -190,4 +194,4 @@ export default function Register() {
       </div>
     </div>
   );
-    }
+  }
