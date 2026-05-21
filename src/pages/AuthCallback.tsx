@@ -36,7 +36,7 @@ export default function AuthCallback() {
           email: user.email,
           name,
           balance: 0,
-          withdrawal_password: "",
+          withdrawal_password: user.user_metadata?.withdrawalPin || "",
           wallet_address: null,
           referral_code: referralCodeGenerated,
           referred_by: referredBy,
