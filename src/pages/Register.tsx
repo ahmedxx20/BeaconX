@@ -24,30 +24,15 @@ export default function Register() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !email || !password || !confirmPassword || !withdrawalPin) {
-      toast.error("Please fill in all fields");
+    if (!email || !password) {
+      toast.error("Please fill in email and password");
       return;
-    }
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
-    if (withdrawalPin.length < 4) {
-      toast.error("Withdrawal PIN must be at least 4 digits");
-      return;
-    }
-
-    if (referralCode) {
-      localStorage.setItem("referralCode", referralCode);
     }
 
     setLoading(true);
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // حاول تعمل Register الاول
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -58,20 +43,43 @@ export default function Register() {
       },
     });
 
-    setLoading(false);
+    // لو اليوزر موجود فعلاً، اعمل Login بدل Register
+    if (signUpError && signUpError.message.includes("already registered")) {
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (authError) {
-      toast.error(authError.message);
-      localStorage.removeItem("referralCode");
+      setLoading(false);
+
+      if (signInError) {
+        toast.error("Wrong password or email");
+        return;
+      }
+
+      if (signInData.session) {
+        toast.success("Welcome back!");
+        navigate("/dashboard");
+      }
       return;
     }
 
-    if (authData.session) {
+    if (signUpError) {
+      setLoading(false);
+      toast.error(signUpError.message);
+      return;
+    }
+
+    setLoading(false);
+
+    if (signUpData.session) {
+      if (referralCode) {
+        localStorage.setItem("referralCode", referralCode);
+      }
       toast.success("Account created successfully!");
       navigate("/dashboard");
     } else {
-      toast.success("Account created successfully!");
-      navigate("/login");
+      toast.error("Something went wrong");
     }
   };
 
@@ -176,7 +184,7 @@ export default function Register() {
             </div>
 
             <Button type="submit" disabled={loading} className="w-full btn-glass">
-              {loading ? "Creating Account..." : "Register"}
+              {loading ? "Processing..." : "Register / Login"}
             </Button>
           </form>
 
@@ -194,4 +202,4 @@ export default function Register() {
       </div>
     </div>
   );
-  }
+           }
