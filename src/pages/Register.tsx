@@ -41,13 +41,21 @@ export default function Register() {
       return;
     }
 
+    // حفظ الريفيرال كود عشان نستخدمه بعد التأكيد
+    if (referralCode) {
+      localStorage.setItem("referralCode", referralCode);
+    }
+
     setLoading(true);
 
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { name },
+        data: { 
+          name,
+          withdrawalPin // بعته في metadata عشان تستخدمه في AuthCallback
+        },
         emailRedirectTo: `${window.location.origin}/auth/callback`
       },
     });
@@ -56,11 +64,11 @@ export default function Register() {
 
     if (authError) {
       toast.error(authError.message);
+      localStorage.removeItem("referralCode"); // امسحه لو فشل التسجيل
       return;
     }
 
     toast.success("Check your email to confirm your account");
-    // مفيش Navigate، خليه يستنى يأكد من الميل
   };
 
   return (
@@ -171,6 +179,7 @@ export default function Register() {
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <button
+              type="button"
               onClick={() => navigate("/login")}
               className="text-emerald-400 hover:text-emerald-300 hover:underline"
             >
@@ -181,4 +190,4 @@ export default function Register() {
       </div>
     </div>
   );
-                }
+    }
