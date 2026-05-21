@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import AuthCallback from "./pages/AuthCallback";  // ← السطر اللي اتزود
 import Dashboard from "./pages/Dashboard";
 import Deposit from "./pages/Deposit";
 import Withdraw from "./pages/Withdraw";
@@ -61,6 +62,7 @@ const App = () => (
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />  {/* ← السطر اللي اتزود */}
               <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/deposit" element={<ProtectedRoute><Deposit /></ProtectedRoute>} />
@@ -83,4 +85,3 @@ const App = () => (
 );
 
 export default App;
-
